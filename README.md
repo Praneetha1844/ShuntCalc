@@ -6,10 +6,11 @@ An infix expression calculator built on the **shunting-yard algorithm**, with a 
 
 - Operators `+ - * /` with correct precedence and left associativity
 - Parentheses, including nesting
-- Decimal numbers (`1.5 * 2.5`)
+- Decimal numbers (`1.5 * 2.5`, `.5`, `5.`)
 - Unary minus and plus (`-(2 + 3)`, `2 * -3`)
-- Clear errors for malformed input, mismatched parentheses and division by zero
-- Calculator window (AWT) with digit, operator and parenthesis keys
+- Clear errors for malformed input, mismatched parentheses, division by zero and results outside the `double` range
+- Calculator window (AWT) with digit, decimal point, operator and parenthesis keys, a delete key and keyboard input (digits, operators, `Enter` or `=` to evaluate, `Backspace` to delete, `Esc` to clear)
+- Results are shown as plain decimal text (no scientific notation), so they can be used in the next expression
 
 ## How it works
 
@@ -37,7 +38,7 @@ pom.xml
 src/
   main/java/dev/praneetha/shuntcalc/
     ExpressionEvaluator.java   tokenizer, shunting-yard, postfix evaluator
-    CalculatorApp.java         AWT front end
+    CalculatorApp.java         AWT front end with keypad and keyboard input
   test/java/dev/praneetha/shuntcalc/
     ExpressionEvaluatorTest.java
 .github/workflows/ci.yml       build and test on every push
@@ -65,20 +66,20 @@ double value = ExpressionEvaluator.evaluate("(2 + 3) * 4"); // 20.0
 
 ## Tests
 
-`ExpressionEvaluatorTest` covers precedence, associativity, parentheses, decimals, whitespace, unary operators, postfix output, division by zero, mismatched parentheses and malformed input.
+`ExpressionEvaluatorTest` covers precedence, associativity, parentheses and deep nesting, decimals (including `.5` and `5.`), whitespace, unary and binary operator mixes, the tokenizer, postfix output and direct postfix evaluation, division by zero, out-of-range results, result formatting, mismatched parentheses and malformed input. The tests are written but have not been run in CI yet.
 
 ## Limitations
 
 - Only the four basic operators; no exponent, modulo or functions
 - Uses `double`, so results carry floating-point rounding
-- The AWT window has no keyboard input and no backspace key
-- The window is not covered by automated tests
+- Implicit multiplication such as `2(3)` is rejected
+- The AWT window is not covered by automated tests (it needs a display)
 
 ## Roadmap
 
-- Exponent and modulo operators
-- Keyboard input and a backspace key
-- Optional `BigDecimal` mode
+- Exponent (right associative) and modulo operators
+- Optional `BigDecimal` mode for exact decimal arithmetic
+- Headless tests for the key-handling logic
 
 ## License
 
