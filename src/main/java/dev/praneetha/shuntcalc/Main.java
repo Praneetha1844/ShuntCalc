@@ -1,3 +1,5 @@
+package dev.praneetha.shuntcalc;
+
 import java.util.Stack;
 
 public class Main {

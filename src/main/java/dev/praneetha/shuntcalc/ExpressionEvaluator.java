@@ -1,3 +1,5 @@
+package dev.praneetha.shuntcalc;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
