@@ -1,5 +1,6 @@
 package dev.praneetha.shuntcalc;
 
+import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -9,7 +10,8 @@ import java.util.List;
  * Evaluates infix arithmetic expressions with the shunting-yard algorithm.
  *
  * <p>Pipeline: {@link #tokenize} -> {@link #toPostfix} -> {@link #evaluatePostfix}.
- * Supports {@code + - * /}, parentheses, decimal numbers and unary minus/plus.
+ * Supports {@code + - * /}, parentheses, decimal numbers (including {@code .5} and {@code 5.})
+ * and unary minus/plus.
  */
 public final class ExpressionEvaluator {
 
@@ -23,7 +25,7 @@ public final class ExpressionEvaluator {
      * Evaluates an infix expression.
      *
      * @throws IllegalArgumentException if the expression is malformed
-     * @throws ArithmeticException      on division by zero
+     * @throws ArithmeticException      on division by zero or a result outside the double range
      */
     public static double evaluate(String expression) {
         return evaluatePostfix(toPostfix(expression));
@@ -47,7 +49,7 @@ public final class ExpressionEvaluator {
                     i++;
                 }
                 String number = expression.substring(start, i);
-                if (!number.matches("\\d+(\\.\\d+)?")) {
+                if (!number.matches("\\d+\\.?\\d*|\\.\\d+")) {
                     throw new IllegalArgumentException("Invalid number: " + number);
                 }
                 tokens.add(number);
@@ -129,7 +131,19 @@ public final class ExpressionEvaluator {
         if (operands.size() != 1) {
             throw new IllegalArgumentException("Invalid expression");
         }
-        return operands.pop();
+        double result = operands.pop();
+        if (Double.isInfinite(result) || Double.isNaN(result)) {
+            throw new ArithmeticException("Result out of range");
+        }
+        return result;
+    }
+
+    /**
+     * Formats a result as plain decimal text that {@link #evaluate} can read back,
+     * without a trailing ".0" and without scientific notation.
+     */
+    public static String format(double value) {
+        return BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
     }
 
     private static double apply(char operator, double left, double right) {
